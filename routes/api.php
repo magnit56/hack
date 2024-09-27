@@ -17,3 +17,13 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/', function () {
+    return 'hello';
+});
+Route::post('/videos/{video}/dislike', function () {
+    return 'hello';
+});
+Route::post('/videos/{video}/like', function () {
+    return 'hello';
+});
