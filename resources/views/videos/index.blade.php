@@ -35,8 +35,15 @@
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title" data-toggle="tooltip" data-placement="top" title="{{ $video->title }}">{{ Str::length($video->title) > 50 ? Str::limit($video->title, 47) : $video->title }}</h5>
-                    <p class="card-text"><span class="badge bg-primary">video</span></p>
+                    <h5 class="card-title" data-toggle="tooltip" data-placement="top" title="{{ $video->title }}">
+                        {{ Str::length($video->title) > 50 ? Str::limit($video->title, 47) : $video->title }}
+                    </h5>
+                    <p class="card-text" data-toggle="tooltip" data-placement="top" title="{{ $video->description }}">
+                        <span class="badge bg-primary">video</span>
+                    </p>
+                    <p class="card-text" data-toggle="tooltip" data-placement="top" title="{{ $video->description }}">
+                        {{ Str::length($video->description) > 30 ? Str::limit($video->description, 27) : $video->description }}
+                    </p>
                     <div id="slider-{{ $loop->index }}"></div>
                     <div id="percentage-{{ $loop->index }}">0%</div>
                     <button id="start-{{ $loop->index }}">Старт</button>
@@ -235,7 +242,6 @@
             });
 
             // Обработка комментариев
-// Обработка комментариев
             $("#submit-comment-{{ $loop->index }}").click(function () {
                 const comment = $("#comment-{{ $loop->index }}").val();
                 if (comment) {
