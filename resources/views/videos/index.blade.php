@@ -178,15 +178,6 @@
                 }
             });
 
-            // Запрос начального количества лайков и дизлайков
-            $.ajax({
-                url: '/api/videos/{{ $video->id }}/counts',
-                method: 'GET',
-                success: function(data) {
-                    $(".likes-count-{{ $loop->index }}").text("👍 " + data.likes_count);
-                    $(".dislikes-count-{{ $loop->index }}").text("👎 " + data.dislikes_count);
-                }
-            });
 
             // Функция остановки
             function stopVideo() {
