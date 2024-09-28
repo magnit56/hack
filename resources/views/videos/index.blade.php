@@ -48,10 +48,11 @@
                     <div id="percentage-{{ $loop->index }}">0%</div>
                     <button id="start-{{ $loop->index }}">Старт</button>
                     <button id="stop-{{ $loop->index }}">Стоп</button>
-                    <button id="like-{{ $loop->index }}" class="btn">👍 Лайк</button>
-                    <button id="dislike-{{ $loop->index }}" class="btn">👎 Дизлайк</button>
-                    <div id="likes-count-{{ $loop->index }}">Лайки: {{ $video->likes_count }}</div>
-                    <div id="dislikes-count-{{ $loop->index }}">Дизлайки: {{ $video->dislikes_count }}</div>
+                    <br>
+                    <button id="like-{{ $loop->index }}" class="btn likes-count-{{ $loop->index }}">👍 {{ $video->likes_count }}</button>
+                    <button id="dislike-{{ $loop->index }}" class="btn dislikes-count-{{ $loop->index }}">👎 {{ $video->dislikes_count }}</button>
+<!--                    <div class="likes-count-{{ $loop->index }}">👍 {{ $video->likes_count }}</div>-->
+<!--                    <div class="dislikes-count-{{ $loop->index }}">👎 {{ $video->dislikes_count }}</div>-->
 
                     <!-- Форма для комментариев -->
                     <div class="comment-section">
@@ -84,6 +85,7 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 
 <script>
+    let csrfToken = $('meta[name="csrf-token"]').attr('content');
     $(document).ready(function () {
     @foreach($videos as $video)
         (function (index) {
@@ -108,8 +110,8 @@
                 url: '/api/videos/{{ $video->id }}/counts',
                 method: 'GET',
                 success: function(data) {
-                    $("#likes-count-{{ $loop->index }}").text("Лайки: " + data.likes_count);
-                    $("#dislikes-count-{{ $loop->index }}").text("Дизлайки: " + data.dislikes_count);
+                    $(".likes-count-{{ $loop->index }}").text("👍 " + data.likes_count);
+                    $(".dislikes-count-{{ $loop->index }}").text("👎 " + data.dislikes_count);
                 }
             });
 
@@ -172,8 +174,8 @@
                         method: 'POST',
                         success: function() {
                             liked = false;
-                            const currentLikes = parseInt($("#likes-count-{{ $loop->index }}").text().split(": ")[1]);
-                            $("#likes-count-{{ $loop->index }}").text("Лайки: " + (currentLikes - 1));
+                            const currentLikes = parseInt($(".likes-count-{{ $loop->index }}").text().split("👍 ")[1]);
+                            $(".likes-count-{{ $loop->index }}").text("👍 " + (currentLikes - 1));
                             $(this).removeClass("btn-success");
                         }.bind(this)
                     });
@@ -184,8 +186,8 @@
                             method: 'POST',
                             success: function() {
                                 disliked = false;
-                                const currentDislikes = parseInt($("#dislikes-count-{{ $loop->index }}").text().split(": ")[1]);
-                                $("#dislikes-count-{{ $loop->index }}").text("Дизлайки: " + (currentDislikes - 1));
+                                const currentDislikes = parseInt($(".dislikes-count-{{ $loop->index }}").text().split("👎 ")[1]);
+                                $(".dislikes-count-{{ $loop->index }}").text("👎 " + (currentDislikes - 1));
                                 $("#dislike-{{ $loop->index }}").removeClass("btn-danger");
                             }
                         });
@@ -195,8 +197,8 @@
                         method: 'POST',
                         success: function(data) {
                             liked = true;
-                            const currentLikes = parseInt($("#likes-count-{{ $loop->index }}").text().split(": ")[1]);
-                            $("#likes-count-{{ $loop->index }}").text("Лайки: " + (currentLikes + 1));
+                            const currentLikes = parseInt($(".likes-count-{{ $loop->index }}").text().split("👍 ")[1]);
+                            $(".likes-count-{{ $loop->index }}").text("👍 " + (currentLikes + 1));
                             $(this).addClass("btn-success");
                         }.bind(this)
                     });
@@ -210,8 +212,8 @@
                         method: 'POST',
                         success: function() {
                             disliked = false;
-                            const currentDislikes = parseInt($("#dislikes-count-{{ $loop->index }}").text().split(": ")[1]);
-                            $("#dislikes-count-{{ $loop->index }}").text("Дизлайки: " + (currentDislikes - 1));
+                            const currentDislikes = parseInt($(".dislikes-count-{{ $loop->index }}").text().split("👎 ")[1]);
+                            $(".dislikes-count-{{ $loop->index }}").text("👎 " + (currentDislikes - 1));
                             $(this).removeClass("btn-danger");
                         }.bind(this)
                     });
@@ -222,8 +224,8 @@
                             method: 'POST',
                             success: function() {
                                 liked = false;
-                                const currentLikes = parseInt($("#likes-count-{{ $loop->index }}").text().split(": ")[1]);
-                                $("#likes-count-{{ $loop->index }}").text("Лайки: " + (currentLikes - 1));
+                                const currentLikes = parseInt($(".likes-count-{{ $loop->index }}").text().split("👍 ")[1]);
+                                $(".likes-count-{{ $loop->index }}").text("👍 " + (currentLikes - 1));
                                 $("#like-{{ $loop->index }}").removeClass("btn-success");
                             }
                         });
@@ -233,8 +235,8 @@
                         method: 'POST',
                         success: function(data) {
                             disliked = true;
-                            const currentDislikes = parseInt($("#dislikes-count-{{ $loop->index }}").text().split(": ")[1]);
-                            $("#dislikes-count-{{ $loop->index }}").text("Дизлайки: " + (currentDislikes + 1));
+                            const currentDislikes = parseInt($(".dislikes-count-{{ $loop->index }}").text().split("👎 ")[1]);
+                            $(".dislikes-count-{{ $loop->index }}").text("👎 " + (currentDislikes + 1));
                             $(this).addClass("btn-danger");
                         }.bind(this)
                     });
@@ -246,6 +248,9 @@
                 const comment = $("#comment-{{ $loop->index }}").val();
                 if (comment) {
                     $.ajax({
+                        headers: {
+                            'X-CSRF-Token': csrfToken // Добавление токена в заголовки запроса
+                        },
                         url: '/api/videos/{{ $video->id }}/comment', // Замени на свой API для отправки комментария
                         method: 'POST',
                         data: { comment: comment },

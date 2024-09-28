@@ -14,9 +14,7 @@ use App\Http\Controllers\VideoController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [VideoController::class, 'index']);
 
 Auth::routes();
 
