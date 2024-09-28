@@ -132,6 +132,11 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script>
     let csrfToken = $('meta[name="csrf-token"]').attr('content');
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     $(document).ready(function () {
     @foreach($videos as $video)
         (function (index) {
@@ -294,9 +299,6 @@
                 const comment = $("#comment-{{ $loop->index }}").val();
                 if (comment) {
                     $.ajax({
-                        headers: {
-                            'X-CSRF-Token': csrfToken // Добавление токена в заголовки запроса
-                        },
                         url: '/api/videos/{{ $video->id }}/comment', // Замени на свой API для отправки комментария
                         method: 'POST',
                         data: { comment: comment },
