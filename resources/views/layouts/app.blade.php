@@ -39,7 +39,7 @@
                 <!-- Centered Button -->
                 @if(Request::is('/'))
                     <div class="mx-auto d-flex justify-content-center position-relative" style="flex-grow: 1;">
-                        <button id="regenerate-content" class="btn btn-success"">Обновить рекомендацию</button>
+                        <a href="/" class="btn btn-success">Обновить рекомендацию</a>
                     </div>
                 @endif
 

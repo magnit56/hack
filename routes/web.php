@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VideoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use App\Models\Video;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,12 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/videos', [VideoController::class, 'index']);
 
 Route::middleware(['web'])->prefix('api')->group(function () {
+    Route::get('/api/videos', function (Request $request) {
+//        RateLimiter::clear('login.'.$request->ip());
+        $videos = Video::inRandomOrder()->get();
+        return response()->json($videos);
+    });
+
     Route::get('/', function (Request $request) {
         RateLimiter::clear('login.'.$request->ip());
         return 'hello';
