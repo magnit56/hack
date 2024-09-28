@@ -2,6 +2,30 @@
 
 @section('content')
 <style>
+    .slider-container {
+        border: 1px solid #ccc; /* Цвет и стиль рамки */
+        padding: 10px; /* Внутренние отступы */
+        margin: 2px; /* Внешние отступы */
+        border-radius: 5px; /* Закругление углов рамки (по желанию) */
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень (по желанию) */
+        display: flex;
+        align-items: center; /* Центрирование по вертикали */
+    }
+    /*.slider-container {*/
+    /*}*/
+
+    .slider {
+        flex: 1; /* Занять оставшееся пространство */
+        margin-right: 10px; /* Отступ между слайдером и процентами */
+    }
+
+    .percentage {
+        margin-left: 10px; /* Отступ между процентами и слайдером */
+    }
+
+    .control-button {
+        margin-left: 10px; /* Отступ между кнопками */
+    }
     .btn.btn-primary {
         border: none; /* Убираем обводку */
         box-shadow: none; /* Убираем тень, если она есть */
@@ -58,11 +82,16 @@
                     <p class="card-text" data-toggle="tooltip" data-placement="top" title="{{ $video->description }}">
                         {{ Str::length($video->description) > 30 ? Str::limit($video->description, 27) : $video->description }}
                     </p>
-                    <div id="slider-{{ $loop->index }}"></div>
-                    <div id="percentage-{{ $loop->index }}">0%</div>
-                    <button id="start-{{ $loop->index }}">Старт</button>
-                    <button id="stop-{{ $loop->index }}">Стоп</button>
-                    <br>
+                    <div class="slider-container">
+                        <button id="start-{{ $loop->index }}" class="control-button">
+                            <i class="fas fa-play"></i> <!-- Иконка "Плей" -->
+                        </button>
+                        <button id="stop-{{ $loop->index }}" class="control-button">
+                            <i class="fas fa-stop"></i> <!-- Иконка "Стоп" -->
+                        </button>
+                        <div id="slider-{{ $loop->index }}" class="slider"></div>
+                        <div id="percentage-{{ $loop->index }}" class="percentage">0%</div>
+                    </div>
                     <button id="like-{{ $loop->index }}" class="btn likes-count-{{ $loop->index }}">👍 {{ $video->likes_count }}</button>
                     <button id="dislike-{{ $loop->index }}" class="btn dislikes-count-{{ $loop->index }}">👎 {{ $video->dislikes_count }}</button>
 <!--                    <div class="likes-count-{{ $loop->index }}">👍 {{ $video->likes_count }}</div>-->
@@ -97,7 +126,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script>
     let csrfToken = $('meta[name="csrf-token"]').attr('content');
     $(document).ready(function () {
