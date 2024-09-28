@@ -2,17 +2,20 @@
 
 @section('content')
 <style>
+    button {
+        margin-top: 3px;
+        margin-bottom: 3px;
+    }
     .slider-container {
         border: 1px solid #ccc; /* Цвет и стиль рамки */
         padding: 10px; /* Внутренние отступы */
-        margin: 2px; /* Внешние отступы */
+        margin-top: 1px; /* Внешние отступы */
+        margin-bottom: 5px; /* Внешние отступы */
         border-radius: 5px; /* Закругление углов рамки (по желанию) */
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень (по желанию) */
         display: flex;
         align-items: center; /* Центрирование по вертикали */
     }
-    /*.slider-container {*/
-    /*}*/
 
     .slider {
         flex: 1; /* Занять оставшееся пространство */
