@@ -15,8 +15,25 @@
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень (по желанию) */
         display: flex;
         align-items: center; /* Центрирование по вертикали */
+        flex-direction: column; /* Измените направление flex на столбик */
     }
 
+    .image-container {
+        width: 100%;        /* Занять всю ширину контейнера */
+    }
+    /*.slider-container {*/
+    /*}*/
+    .controls {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        margin-top: 10px; /* Добавлено для отступа между изображением и контролами */
+    }
+    .slider-container img {
+        width: 100%;        /* Занять всю ширину контейнера */
+        height: auto;      /* Высота будет автоматически изменяться пропорционально */
+        border-radius: 5px; /* Закругление углов изображения (по желанию) */
+    }
     .slider {
         flex: 1; /* Занять оставшееся пространство */
         margin-right: 10px; /* Отступ между слайдером и процентами */
@@ -85,20 +102,25 @@
                     <p class="card-text" data-toggle="tooltip" data-placement="top" title="{{ $video->description }}">
                         {{ Str::length($video->description) > 30 ? Str::limit($video->description, 27) : $video->description }}
                     </p>
-                    <div class="slider-container">
-                        <button id="start-{{ $loop->index }}" class="control-button">
-                            <i class="fas fa-play"></i> <!-- Иконка "Плей" -->
-                        </button>
-                        <button id="stop-{{ $loop->index }}" class="control-button">
-                            <i class="fas fa-stop"></i> <!-- Иконка "Стоп" -->
-                        </button>
-                        <div id="slider-{{ $loop->index }}" class="slider"></div>
-                        <div id="percentage-{{ $loop->index }}" class="percentage">0%</div>
+                    <div class="slider-container" style="position: relative; width: 100%; max-width: 600px; overflow: hidden;">
+                        <div class="image-container"> <!-- Новый контейнер для изображения -->
+                            <img src="{{ asset('storage/images/demo.png') }}" alt="Demo Image">
+                        </div>
+                        <div class="controls"> <!-- Контейнер для кнопок и слайдера -->
+                            <button id="start-{{ $loop->index }}" class="control-button">
+                                <i class="fas fa-play"></i> <!-- Иконка "Плей" -->
+                            </button>
+                            <button id="stop-{{ $loop->index }}" class="control-button">
+                                <i class="fas fa-stop"></i> <!-- Иконка "Стоп" -->
+                            </button>
+                            <div id="slider-{{ $loop->index }}" class="slider"></div>
+                            <div id="percentage-{{ $loop->index }}" class="percentage">0%</div>
+                        </div>
                     </div>
+
+
                     <button id="like-{{ $loop->index }}" class="btn likes-count-{{ $loop->index }}">👍 {{ $video->likes_count }}</button>
                     <button id="dislike-{{ $loop->index }}" class="btn dislikes-count-{{ $loop->index }}">👎 {{ $video->dislikes_count }}</button>
-<!--                    <div class="likes-count-{{ $loop->index }}">👍 {{ $video->likes_count }}</div>-->
-<!--                    <div class="dislikes-count-{{ $loop->index }}">👎 {{ $video->dislikes_count }}</div>-->
 
                     <!-- Форма для комментариев -->
                     <div class="comment-section">
