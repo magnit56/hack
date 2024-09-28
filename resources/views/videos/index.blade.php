@@ -50,12 +50,13 @@
 </style>
 <script>
     $(document).ready(function () {
-        // Устанавливаем событие для каждого видео
     @foreach($videos as $video)
         (function (index) {
             let interval;
             let percentage = 0;
             const videoElement = $(`video:eq(${index})`)[0]; // Получаем элемент видео по индексу
+            let liked = false;
+            let disliked = false;
 
             // Инициализация ползунка
             $("#slider-{{ $loop->index }}").slider({
@@ -67,12 +68,38 @@
                 }
             });
 
+            // Запрос начального количества лайков и дизлайков
+            $.ajax({
+                url: '/api/videos/{{ $video->id }}/counts', // Замени на свой API
+                method: 'GET',
+                success: function(data) {
+                    $("#likes-count-{{ $loop->index }}").text("Лайки: " + data.likes_count);
+                    $("#dislikes-count-{{ $loop->index }}").text("Дизлайки: " + data.dislikes_count);
+                    // Установите состояния liked и disliked если необходимо (например, если данных о пользователе в ответе нет)
+                }
+            });
+
             // Функция остановки
+// Функция остановки
             function stopVideo() {
                 clearInterval(interval);
-                console.log("Процент при остановке видео:", percentage);
                 $("#start-{{ $loop->index }}").prop("disabled", false);
                 $("#stop-{{ $loop->index }}").prop("disabled", true);
+
+                // Отправка информации о просмотренном проценте на сервер
+                $.ajax({
+                    url: '/api/videos/{{ $video->id }}/viewed', // Ваш API для обработки процента
+                    method: 'POST',
+                    data: {
+                        percentage: percentage // Отправляем процент
+                    },
+                    success: function(response) {
+                        console.log('Процент просмотра успешно отправлен:', response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Ошибка при отправке процента просмотра:', error);
+                    }
+                });
             }
 
             // Кнопка "Старт"
@@ -107,31 +134,87 @@
 
             // Обработка лайков и дизлайков
             $("#like-{{ $loop->index }}").click(function () {
-                console.log(`Лайк для видео: ${{{ $video->id }}}`);
-                $.ajax({
-                    url: '/api/videos/{{ $video->id }}/like', // Замени на свой API
-                    method: 'POST',
-                    success: function(data) {
-                        const currentLikes = parseInt($("#likes-count-{{ $loop->index }}").text().split(": ")[1]);
-                        $("#likes-count-{{ $loop->index }}").text("Лайки: " + (currentLikes + 1));
-                        $(this).addClass("btn-success"); // Окрасить кнопку в зеленый
-                        $("#dislike-{{ $loop->index }}").removeClass("btn-danger"); // Убрать красный цвет с дизлайка
-                    }.bind(this) // Привязать контекст
-                });
+                if (liked) {
+                    // Отмена лайка
+                    $.ajax({
+                        url: '/api/videos/{{ $video->id }}/unlike', // Замени на свой API
+                        method: 'POST',
+                        success: function() {
+                            liked = false;
+                            const currentLikes = parseInt($("#likes-count-{{ $loop->index }}").text().split(": ")[1]);
+                            $("#likes-count-{{ $loop->index }}").text("Лайки: " + (currentLikes - 1));
+                            $(this).removeClass("btn-success"); // Убрать зелёный цвет
+                        }.bind(this) // Привязать контекст
+                    });
+                } else {
+                    // Если есть дизлайк, убираем его
+                    if (disliked) {
+                        $.ajax({
+                            url: '/api/videos/{{ $video->id }}/undislike', // Замени на свой API
+                            method: 'POST',
+                            success: function() {
+                                disliked = false;
+                                const currentDislikes = parseInt($("#dislikes-count-{{ $loop->index }}").text().split(": ")[1]);
+                                $("#dislikes-count-{{ $loop->index }}").text("Дизлайки: " + (currentDislikes - 1));
+                                $("#dislike-{{ $loop->index }}").removeClass("btn-danger");
+                            }
+                        });
+                    }
+
+                    // Ставим лайк
+                    $.ajax({
+                        url: '/api/videos/{{ $video->id }}/like', // Замени на свой API
+                        method: 'POST',
+                        success: function(data) {
+                            liked = true;
+                            const currentLikes = parseInt($("#likes-count-{{ $loop->index }}").text().split(": ")[1]);
+                            $("#likes-count-{{ $loop->index }}").text("Лайки: " + (currentLikes + 1));
+                            $(this).addClass("btn-success"); // Окрасить кнопку в зеленый
+                        }.bind(this) // Привязать контекст
+                    });
+                }
             });
 
             $("#dislike-{{ $loop->index }}").click(function () {
-                console.log(`Дизлайк для видео: ${{{ $video->id }}}`);
-                $.ajax({
-                    url: '/api/videos/{{ $video->id }}/dislike', // Замени на свой API
-                    method: 'POST',
-                    success: function(data) {
-                        const currentDislikes = parseInt($("#dislikes-count-{{ $loop->index }}").text().split(": ")[1]);
-                        $("#dislikes-count-{{ $loop->index }}").text("Дизлайки: " + (currentDislikes + 1));
-                        $(this).addClass("btn-danger"); // Окрасить кнопку в красный
-                        $("#like-{{ $loop->index }}").removeClass("btn-success"); // Убрать зеленый цвет с лайка
-                    }.bind(this) // Привязать контекст
-                });
+                if (disliked) {
+                    // Отмена дизлайка
+                    $.ajax({
+                        url: '/api/videos/{{ $video->id }}/undislike', // Замени на свой API
+                        method: 'POST',
+                        success: function() {
+                            disliked = false;
+                            const currentDislikes = parseInt($("#dislikes-count-{{ $loop->index }}").text().split(": ")[1]);
+                            $("#dislikes-count-{{ $loop->index }}").text("Дизлайки: " + (currentDislikes - 1));
+                            $(this).removeClass("btn-danger"); // Убрать красный цвет
+                        }.bind(this) // Привязать контекст
+                    });
+                } else {
+                    // Если есть лайк, убираем его
+                    if (liked) {
+                        $.ajax({
+                            url: '/api/videos/{{ $video->id }}/unlike', // Замени на свой API
+                            method: 'POST',
+                            success: function() {
+                                liked = false;
+                                const currentLikes = parseInt($("#likes-count-{{ $loop->index }}").text().split(": ")[1]);
+                                $("#likes-count-{{ $loop->index }}").text("Лайки: " + (currentLikes - 1));
+                                $("#like-{{ $loop->index }}").removeClass("btn-success");
+                            }
+                        });
+                    }
+
+                    // Ставим дизлайк
+                    $.ajax({
+                        url: '/api/videos/{{ $video->id }}/dislike', // Замени на свой API
+                        method: 'POST',
+                        success: function(data) {
+                            disliked = true;
+                            const currentDislikes = parseInt($("#dislikes-count-{{ $loop->index }}").text().split(": ")[1]);
+                            $("#dislikes-count-{{ $loop->index }}").text("Дизлайки: " + (currentDislikes + 1));
+                            $(this).addClass("btn-danger"); // Окрасить кнопку в красный
+                        }.bind(this) // Привязать контекст
+                    });
+                }
             });
 
         })({{ $loop->index }});

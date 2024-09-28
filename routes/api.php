@@ -27,3 +27,18 @@ Route::post('/videos/{video}/dislike', function () {
 Route::post('/videos/{video}/like', function () {
     return 'hello';
 });
+Route::post('/videos/{video}/undislike', function () {
+    return 'hello';
+});
+Route::post('/videos/{video}/unlike', function () {
+    return 'hello';
+});
+Route::post('/videos/{video}/viewed', function (Request $request) {
+    return $request->input();
+});
+Route::get('/videos/{video}/counts', function () {
+    return [
+        'likes_count' => 1,
+        'dislikes_count' => 2,
+    ];
+});
