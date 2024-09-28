@@ -2,6 +2,16 @@
 
 @section('content')
 <style>
+    .btn.btn-primary {
+        border: none; /* Убираем обводку */
+        box-shadow: none; /* Убираем тень, если она есть */
+    }
+
+    .btn.btn-primary:focus {
+        outline: none; /* Убираем обводку при фокусе */
+        box-shadow: none; /* Убираем тень при фокусе */
+    }
+
     .btn-custom {
         background-color: #100943;
         color: white; /* Чтобы текст кнопки стал белым */
