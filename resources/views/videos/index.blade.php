@@ -2,6 +2,10 @@
 
 @section('content')
 <style>
+    .btn-custom {
+        background-color: #100943;
+        color: white; /* Чтобы текст кнопки стал белым */
+    }
     .highlight {
         border-color: green;
         background-color: #ccffcc; /* Салатовый фон */
@@ -39,7 +43,7 @@
                         {{ Str::length($video->title) > 50 ? Str::limit($video->title, 47) : $video->title }}
                     </h5>
                     <p class="card-text" data-toggle="tooltip" data-placement="top" title="{{ $video->description }}">
-                        <span class="badge bg-primary">video</span>
+                        <span class="badge" style="background-color: #100943; color: white;">video</span>
                     </p>
                     <p class="card-text" data-toggle="tooltip" data-placement="top" title="{{ $video->description }}">
                         {{ Str::length($video->description) > 30 ? Str::limit($video->description, 27) : $video->description }}
@@ -57,7 +61,7 @@
                     <!-- Форма для комментариев -->
                     <div class="comment-section">
                         <textarea id="comment-{{ $loop->index }}" placeholder="Введите комментарий" class="form-control mb-2"></textarea>
-                        <button id="submit-comment-{{ $loop->index }}" class="btn btn-primary">Оставить комментарий</button>
+                        <button id="submit-comment-{{ $loop->index }}" class="btn btn-primary" style="background-color: #100943; color: white;">Оставить комментарий</button>
                         <div id="comment-success-message-{{ $loop->index }}" class="text-success mt-2" style="display:none;">Комментарий оставлен!</div>
                     </div>
                 </div>
