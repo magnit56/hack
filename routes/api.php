@@ -36,6 +36,9 @@ Route::post('/videos/{video}/unlike', function () {
 Route::post('/videos/{video}/viewed', function (Request $request) {
     return $request->input();
 });
+Route::post('/videos/{video}/comment', function (Request $request) {
+    return 'hello';
+});
 Route::get('/videos/{video}/counts', function () {
     return [
         'likes_count' => 1,

@@ -2,6 +2,14 @@
 
 @section('content')
 <style>
+    .highlight {
+        border-color: green;
+        background-color: #ccffcc; /* Салатовый фон */
+    }
+    /* Добавьте класс для обычного состояния */
+    .comment-input {
+        border-color: #ced4da; /* Стандартный цвет границы */
+    }
     .video-container video {
         position: absolute;
         top: 0;
@@ -16,6 +24,9 @@
     .btn-danger {
         background-color: red;
         color: white;
+    }
+    .slider {
+        margin: 20px;
     }
 </style>
 <div class="container">
@@ -34,20 +45,37 @@
                     <button id="dislike-{{ $loop->index }}" class="btn">👎 Дизлайк</button>
                     <div id="likes-count-{{ $loop->index }}">Лайки: {{ $video->likes_count }}</div>
                     <div id="dislikes-count-{{ $loop->index }}">Дизлайки: {{ $video->dislikes_count }}</div>
+
+                    <!-- Форма для комментариев -->
+                    <div class="comment-section">
+                        <textarea id="comment-{{ $loop->index }}" placeholder="Введите комментарий" class="form-control mb-2"></textarea>
+                        <button id="submit-comment-{{ $loop->index }}" class="btn btn-primary">Оставить комментарий</button>
+                        <div id="comment-success-message-{{ $loop->index }}" class="text-success mt-2" style="display:none;">Комментарий оставлен!</div>
+                    </div>
                 </div>
             </div>
         </div>
         @endforeach
     </div>
 </div>
+<!-- Модальное окно для сообщений -->
+<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="commentModalLabel">Успех</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Комментарий оставлен!
+            </div>
+        </div>
+    </div>
+</div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-<style>
-    .slider {
-        margin: 20px;
-    }
-</style>
+
 <script>
     $(document).ready(function () {
     @foreach($videos as $video)
@@ -70,17 +98,15 @@
 
             // Запрос начального количества лайков и дизлайков
             $.ajax({
-                url: '/api/videos/{{ $video->id }}/counts', // Замени на свой API
+                url: '/api/videos/{{ $video->id }}/counts',
                 method: 'GET',
                 success: function(data) {
                     $("#likes-count-{{ $loop->index }}").text("Лайки: " + data.likes_count);
                     $("#dislikes-count-{{ $loop->index }}").text("Дизлайки: " + data.dislikes_count);
-                    // Установите состояния liked и disliked если необходимо (например, если данных о пользователе в ответе нет)
                 }
             });
 
             // Функция остановки
-// Функция остановки
             function stopVideo() {
                 clearInterval(interval);
                 $("#start-{{ $loop->index }}").prop("disabled", false);
@@ -88,11 +114,9 @@
 
                 // Отправка информации о просмотренном проценте на сервер
                 $.ajax({
-                    url: '/api/videos/{{ $video->id }}/viewed', // Ваш API для обработки процента
+                    url: '/api/videos/{{ $video->id }}/viewed',
                     method: 'POST',
-                    data: {
-                        percentage: percentage // Отправляем процент
-                    },
+                    data: { percentage: percentage },
                     success: function(response) {
                         console.log('Процент просмотра успешно отправлен:', response);
                     },
@@ -137,20 +161,19 @@
                 if (liked) {
                     // Отмена лайка
                     $.ajax({
-                        url: '/api/videos/{{ $video->id }}/unlike', // Замени на свой API
+                        url: '/api/videos/{{ $video->id }}/unlike',
                         method: 'POST',
                         success: function() {
                             liked = false;
                             const currentLikes = parseInt($("#likes-count-{{ $loop->index }}").text().split(": ")[1]);
                             $("#likes-count-{{ $loop->index }}").text("Лайки: " + (currentLikes - 1));
-                            $(this).removeClass("btn-success"); // Убрать зелёный цвет
-                        }.bind(this) // Привязать контекст
+                            $(this).removeClass("btn-success");
+                        }.bind(this)
                     });
                 } else {
-                    // Если есть дизлайк, убираем его
                     if (disliked) {
                         $.ajax({
-                            url: '/api/videos/{{ $video->id }}/undislike', // Замени на свой API
+                            url: '/api/videos/{{ $video->id }}/undislike',
                             method: 'POST',
                             success: function() {
                                 disliked = false;
@@ -160,39 +183,35 @@
                             }
                         });
                     }
-
-                    // Ставим лайк
                     $.ajax({
-                        url: '/api/videos/{{ $video->id }}/like', // Замени на свой API
+                        url: '/api/videos/{{ $video->id }}/like',
                         method: 'POST',
                         success: function(data) {
                             liked = true;
                             const currentLikes = parseInt($("#likes-count-{{ $loop->index }}").text().split(": ")[1]);
                             $("#likes-count-{{ $loop->index }}").text("Лайки: " + (currentLikes + 1));
-                            $(this).addClass("btn-success"); // Окрасить кнопку в зеленый
-                        }.bind(this) // Привязать контекст
+                            $(this).addClass("btn-success");
+                        }.bind(this)
                     });
                 }
             });
 
             $("#dislike-{{ $loop->index }}").click(function () {
                 if (disliked) {
-                    // Отмена дизлайка
                     $.ajax({
-                        url: '/api/videos/{{ $video->id }}/undislike', // Замени на свой API
+                        url: '/api/videos/{{ $video->id }}/undislike',
                         method: 'POST',
                         success: function() {
                             disliked = false;
                             const currentDislikes = parseInt($("#dislikes-count-{{ $loop->index }}").text().split(": ")[1]);
                             $("#dislikes-count-{{ $loop->index }}").text("Дизлайки: " + (currentDislikes - 1));
-                            $(this).removeClass("btn-danger"); // Убрать красный цвет
-                        }.bind(this) // Привязать контекст
+                            $(this).removeClass("btn-danger");
+                        }.bind(this)
                     });
                 } else {
-                    // Если есть лайк, убираем его
                     if (liked) {
                         $.ajax({
-                            url: '/api/videos/{{ $video->id }}/unlike', // Замени на свой API
+                            url: '/api/videos/{{ $video->id }}/unlike',
                             method: 'POST',
                             success: function() {
                                 liked = false;
@@ -202,21 +221,43 @@
                             }
                         });
                     }
-
-                    // Ставим дизлайк
                     $.ajax({
-                        url: '/api/videos/{{ $video->id }}/dislike', // Замени на свой API
+                        url: '/api/videos/{{ $video->id }}/dislike',
                         method: 'POST',
                         success: function(data) {
                             disliked = true;
                             const currentDislikes = parseInt($("#dislikes-count-{{ $loop->index }}").text().split(": ")[1]);
                             $("#dislikes-count-{{ $loop->index }}").text("Дизлайки: " + (currentDislikes + 1));
-                            $(this).addClass("btn-danger"); // Окрасить кнопку в красный
-                        }.bind(this) // Привязать контекст
+                            $(this).addClass("btn-danger");
+                        }.bind(this)
                     });
                 }
             });
 
+            // Обработка комментариев
+// Обработка комментариев
+            $("#submit-comment-{{ $loop->index }}").click(function () {
+                const comment = $("#comment-{{ $loop->index }}").val();
+                if (comment) {
+                    $.ajax({
+                        url: '/api/videos/{{ $video->id }}/comment', // Замени на свой API для отправки комментария
+                        method: 'POST',
+                        data: { comment: comment },
+                        success: function() {
+                            $("#comment-{{ $loop->index }}").addClass('highlight').removeClass('comment-input'); // Подсвечиваем поле ввода
+                            $("#comment-{{ $loop->index }}").val(''); // Очистить поле ввода
+                            setTimeout(function() {
+                                $("#comment-{{ $loop->index }}").removeClass('highlight').addClass('comment-input'); // Убираем подсветку через 2 секунды
+                            }, 2000); // Задержка в 2000 мс
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Ошибка при отправке комментария:', error);
+                        }
+                    });
+                } else {
+                    alert("Пожалуйста, введите комментарий.");
+                }
+            });
         })({{ $loop->index }});
     @endforeach
     });
