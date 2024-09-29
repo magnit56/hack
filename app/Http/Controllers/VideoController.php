@@ -10,14 +10,15 @@ use Illuminate\Support\Facades\Session;
 
 class VideoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $url = env("MAIN_API_URL", "http://5.35.94.149:5000/receive");
+        $video = $request->session()->get('last', '00000859-f2bf-4578-8d90-429d4c0e5c9c');
 
         // Тело запроса, например, массив данных
         $requestBody = [
             'session_id' => \Illuminate\Support\Facades\Session::getId(),
-            'video_id' => ['00000859-f2bf-4578-8d90-429d4c0e5c9c'],
+            'video_id' => [$video],
             'action' => 'top',
             'info' => [
                 'foo' => 80
@@ -38,11 +39,13 @@ class VideoController extends Controller
                 'video_id' => $value->video_id,
             ]);
         }
+
         return view('videos.index', compact('videos'));
     }
 
     public function action(Request $request, string $video)
     {
+        $request->session()->put('last', $video);
         $requestBody = [
             'session_id' => Session::getId(),
             'video_id' => [$video],
