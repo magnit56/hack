@@ -99,7 +99,7 @@
                         {{ Str::length($video->title) > 50 ? Str::limit($video->title, 47) : $video->title }}
                     </h5>
                     <p class="card-text" data-toggle="tooltip" data-placement="top" title="{{ $video->description }}">
-                        <span class="badge" style="background-color: #100943; color: white;">video</span>
+                        <span class="badge" style="background-color: #100943; color: white;">{{ $video->category_id }}</span>
                     </p>
                     <p class="card-text" data-toggle="tooltip" data-placement="top" title="{{ $video->description }}">
                         {{ Str::length($video->description) > 30 ? Str::limit($video->description, 27) : $video->description }}
