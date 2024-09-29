@@ -60,32 +60,32 @@ Route::middleware(['web'])->prefix('api')->group(function () {
         RateLimiter::clear('login.'.$request->ip());
 
 
-//        $url = 'http://203.0.113.1:5000/receive';
-//
-//        // Тело запроса, например, массив данных
-//        $requestBody = [
-//            'session_id' => 'value1',
-//            "video_id" => "00000859-f2bf-4578-8d90-429d4c0e5c9c",
-//            "action" => "stop",
-//            "info" => [
-//                "percentage" => 80,
-//            ],
-//        ];
-//
-//        // Отправка POST-запроса
-//        $response = \Illuminate\Support\Facades\Http::post($url, $requestBody);
-//
-//        // Получение тела ответа
-//        $responseBody = $response->body(); // Вся причина
-//        // Если вам нужно получить данные как массив
-//        // $responseData = $response->json();
-//
-//        return $responseBody; // Вернуть или обработать ответ, как вам нужно
+        $url = '127.0.0.1:5000/receive';
 
-        return [
-            'sess' => \Illuminate\Support\Facades\Session::getId(),
-            'de' => 'dede',
+        // Тело запроса, например, массив данных
+        $requestBody = [
+            'session_id' => \Illuminate\Support\Facades\Session::getId(),
+            'video_id' => ['00000859-f2bf-4578-8d90-429d4c0e5c9c'],
+            'action' => 'top',
+            'info' => [
+                'percentage' => 80
+            ]
         ];
+
+        // Отправка POST-запроса
+        $response = \Illuminate\Support\Facades\Http::post($url, $requestBody);
+
+        // Получение тела ответа
+        $responseBody = $response->body(); // Вся причина
+        // Если вам нужно получить данные как массив
+        // $responseData = $response->json();
+
+        return $responseBody; // Вернуть или обработать ответ, как вам нужно
+
+//        return [
+//            'sess' => \Illuminate\Support\Facades\Session::getId(),
+//            'de' => 'dede',
+//        ];
     });
     Route::get('/videos/{video}/counts', function (Request $request) {
         RateLimiter::clear('login.'.$request->ip());

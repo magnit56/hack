@@ -93,6 +93,8 @@
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
+                    <input type="hidden" id="video-id-{{ $loop->index }}" value="{{ $video->video_id }}">
+<!--                    <span >{{ $video->video_id }}</span>-->
                     <h5 class="card-title" data-toggle="tooltip" data-placement="top" title="{{ $video->title }}">
                         {{ Str::length($video->title) > 50 ? Str::limit($video->title, 47) : $video->title }}
                     </h5>
@@ -103,29 +105,26 @@
                         {{ Str::length($video->description) > 30 ? Str::limit($video->description, 27) : $video->description }}
                     </p>
                     <div class="slider-container" style="position: relative; width: 100%; max-width: 600px; overflow: hidden;">
-                        <div class="image-container"> <!-- Новый контейнер для изображения -->
+                        <div class="image-container">
                             <img src="{{ asset('storage/images/demo.png') }}" alt="Demo Image">
                         </div>
-                        <div class="controls"> <!-- Контейнер для кнопок и слайдера -->
-                            <button id="start-{{ $loop->index }}" class="control-button">
-                                <i class="fas fa-play"></i> <!-- Иконка "Плей" -->
+                        <div class="controls">
+                            <button id="start-{{ $loop->index }}" class="control-button" data-video-id="{{ $video->video_id }}">
+                                <i class="fas fa-play"></i>
                             </button>
-                            <button id="stop-{{ $loop->index }}" class="control-button">
-                                <i class="fas fa-stop"></i> <!-- Иконка "Стоп" -->
+                            <button id="stop-{{ $loop->index }}" class="control-button" data-video-id="{{ $video->video_id }}">
+                                <i class="fas fa-stop"></i>
                             </button>
                             <div id="slider-{{ $loop->index }}" class="slider"></div>
                             <div id="percentage-{{ $loop->index }}" class="percentage">0%</div>
                         </div>
                     </div>
+                    <button id="like-{{ $loop->index }}" class="btn likes-count-{{ $loop->index }}" data-video-id="{{ $video->video_id }}">👍 {{ $video->likes_count }}</button>
+                    <button id="dislike-{{ $loop->index }}" class="btn dislikes-count-{{ $loop->index }}" data-video-id="{{ $video->video_id }}">👎 {{ $video->dislikes_count }}</button>
 
-
-                    <button id="like-{{ $loop->index }}" class="btn likes-count-{{ $loop->index }}">👍 {{ $video->likes_count }}</button>
-                    <button id="dislike-{{ $loop->index }}" class="btn dislikes-count-{{ $loop->index }}">👎 {{ $video->dislikes_count }}</button>
-
-                    <!-- Форма для комментариев -->
                     <div class="comment-section">
                         <textarea id="comment-{{ $loop->index }}" placeholder="Введите комментарий" class="form-control mb-2"></textarea>
-                        <button id="submit-comment-{{ $loop->index }}" class="btn btn-primary" style="background-color: #100943; color: white;">Оставить комментарий</button>
+                        <button id="submit-comment-{{ $loop->index }}" class="btn btn-primary" style="background-color: #100943; color: white;" data-video-id="{{ $video->video_id }}">Оставить комментарий</button>
                         <div id="comment-success-message-{{ $loop->index }}" class="text-success mt-2" style="display:none;">Комментарий оставлен!</div>
                     </div>
                 </div>
@@ -182,12 +181,13 @@
             // Функция остановки
             function stopVideo() {
                 clearInterval(interval);
+                const videoId = $(this).data("video-id"); // Получаем video-id
                 $("#start-{{ $loop->index }}").prop("disabled", false);
                 $("#stop-{{ $loop->index }}").prop("disabled", true);
 
                 // Отправка информации о просмотренном проценте на сервер
                 $.ajax({
-                    url: '/api/videos/{{ $video->id }}/viewed',
+                    url: '/api/videos/{{ $video->video_id }}/viewed',
                     method: 'POST',
                     data: { percentage: percentage },
                     success: function(response) {
@@ -201,6 +201,7 @@
 
             // Кнопка "Старт"
             $("#start-{{ $loop->index }}").click(function () {
+                const videoId = $(this).data("video-id"); // Получаем video-id
                 $("#start-{{ $loop->index }}").prop("disabled", true);
                 $("#stop-{{ $loop->index }}").prop("disabled", false);
 
@@ -231,10 +232,11 @@
 
             // Обработка лайков и дизлайков
             $("#like-{{ $loop->index }}").click(function () {
+                const videoId = $(this).data("video-id"); // Получаем video-id
                 if (liked) {
                     // Отмена лайка
                     $.ajax({
-                        url: '/api/videos/{{ $video->id }}/unlike',
+                        url: '/api/videos/{{ $video->video_id }}/unlike',
                         method: 'POST',
                         success: function() {
                             liked = false;
@@ -246,7 +248,7 @@
                 } else {
                     if (disliked) {
                         $.ajax({
-                            url: '/api/videos/{{ $video->id }}/undislike',
+                            url: '/api/videos/{{ $video->video_id }}/undislike',
                             method: 'POST',
                             success: function() {
                                 disliked = false;
@@ -257,7 +259,7 @@
                         });
                     }
                     $.ajax({
-                        url: '/api/videos/{{ $video->id }}/like',
+                        url: '/api/videos/{{ $video->video_id }}/like',
                         method: 'POST',
                         success: function(data) {
                             liked = true;
@@ -270,9 +272,10 @@
             });
 
             $("#dislike-{{ $loop->index }}").click(function () {
+                const videoId = $(this).data("video-id"); // Получаем video-id
                 if (disliked) {
                     $.ajax({
-                        url: '/api/videos/{{ $video->id }}/undislike',
+                        url: '/api/videos/{{ $video->video_id }}/undislike',
                         method: 'POST',
                         success: function() {
                             disliked = false;
@@ -284,7 +287,7 @@
                 } else {
                     if (liked) {
                         $.ajax({
-                            url: '/api/videos/{{ $video->id }}/unlike',
+                            url: '/api/videos/{{ $video->video_id }}/unlike',
                             method: 'POST',
                             success: function() {
                                 liked = false;
@@ -295,7 +298,7 @@
                         });
                     }
                     $.ajax({
-                        url: '/api/videos/{{ $video->id }}/dislike',
+                        url: '/api/videos/{{ $video->video_id }}/dislike',
                         method: 'POST',
                         success: function(data) {
                             disliked = true;
@@ -309,10 +312,11 @@
 
             // Обработка комментариев
             $("#submit-comment-{{ $loop->index }}").click(function () {
+                const videoId = $(this).data("video-id"); // Получаем video-id
                 const comment = $("#comment-{{ $loop->index }}").val();
                 if (comment) {
                     $.ajax({
-                        url: '/api/videos/{{ $video->id }}/comment', // Замени на свой API для отправки комментария
+                        url: '/api/videos/{{ $video->video_id }}/comment', // Замени на свой API для отправки комментария
                         method: 'POST',
                         data: { comment: comment },
                         success: function() {

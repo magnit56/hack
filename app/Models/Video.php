@@ -9,13 +9,23 @@ class Video extends Model
 {
     use HasFactory;
 
-    public function getLikesCountAttribute()
-    {
-        return 5;
-    }
+    public $fillable = [
+        'category_id',
+        'description',
+        'title',
+        'dislikes_count',
+        'likes_count',
+        'video_id',
+        'id',
+    ];
 
-    public function getDislikesCountAttribute()
-    {
-        return 2;
-    }
+//    public function getLikesCountAttribute()
+//    {
+//        return 5;
+//    }
+//
+//    public function getDislikesCountAttribute()
+//    {
+//        return 2;
+//    }
 }
