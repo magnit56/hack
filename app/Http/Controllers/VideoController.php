@@ -22,29 +22,12 @@ class VideoController extends Controller
                 'foo' => 80
             ]
         ];
-
-        // Отправка POST-запроса
-//        try {
-//            $response = Http::post($url, $requestBody);
-//        } catch (\Exception $e) {
-//            dump($e->getMessage());
-//            dd();
-//        }
         $response = Http::post($url, $requestBody);
-
-        // Получение тела ответа
         $responseBody = $response->body(); // Вся причина
-        // Если вам нужно получить данные как массив
-        // $responseData = $response->json();
-
-//        return $responseBody; // Вернуть или обработать ответ, как вам нужно
-//        dump(json_decode($responseBody));
         $videos = [];
         $body = json_decode($responseBody);
-//        dump($body);
         $values = $body->videos;
         foreach ($values as $value) {
-//            dd($value);
             $videos[] = Video::make([
                 'category_id' => $value->category_id,
                 'description' => $value->description,
@@ -54,7 +37,6 @@ class VideoController extends Controller
                 'video_id' => $value->video_id,
             ]);
         }
-//        $videos = Video::inRandomOrder()->get();
         return view('videos.index', compact('videos'));
     }
 }

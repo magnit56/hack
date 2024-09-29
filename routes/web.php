@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VideoController;
 use Illuminate\Http\Request;
@@ -38,54 +39,105 @@ Route::middleware(['web'])->prefix('api')->group(function () {
     });
     Route::post('/videos/{video}/dislike', function (Request $request) {
         RateLimiter::clear('login.'.$request->ip());
-        return 'hello';
-    });
-    Route::post('/videos/{video}/like', function (Request $request) {
-        RateLimiter::clear('login.'.$request->ip());
-        return 'hello';
-    });
-    Route::post('/videos/{video}/undislike', function (Request $request) {
-        RateLimiter::clear('login.'.$request->ip());
-        return 'hello';
-    });
-    Route::post('/videos/{video}/unlike', function (Request $request) {
-        RateLimiter::clear('login.'.$request->ip());
-        return 'hello';
-    });
-    Route::post('/videos/{video}/viewed', function (Request $request) {
-        RateLimiter::clear('login.'.$request->ip());
-        return $request->input();
-    });
-    Route::post('/videos/{video}/comment', function (Request $request) {
-        RateLimiter::clear('login.'.$request->ip());
-
-
-        $url = '127.0.0.1:5000/receive';
+        $url = env("MAIN_API_URL", "http://5.35.94.149:5000/receive");
 
         // Тело запроса, например, массив данных
         $requestBody = [
             'session_id' => \Illuminate\Support\Facades\Session::getId(),
             'video_id' => ['00000859-f2bf-4578-8d90-429d4c0e5c9c'],
-            'action' => 'top',
+            'action' => 'dislike',
             'info' => [
-                'percentage' => 80
+                'foo' => 80
             ]
         ];
-
-        // Отправка POST-запроса
-        $response = \Illuminate\Support\Facades\Http::post($url, $requestBody);
-
-        // Получение тела ответа
+        $response = Http::post($url, $requestBody);
         $responseBody = $response->body(); // Вся причина
-        // Если вам нужно получить данные как массив
-        // $responseData = $response->json();
+        return $responseBody;
+    });
+    Route::post('/videos/{video}/like', function (Request $request) {
+        RateLimiter::clear('login.'.$request->ip());
+        $url = env("MAIN_API_URL", "http://5.35.94.149:5000/receive");
 
-        return $responseBody; // Вернуть или обработать ответ, как вам нужно
+        // Тело запроса, например, массив данных
+        $requestBody = [
+            'session_id' => \Illuminate\Support\Facades\Session::getId(),
+            'video_id' => ['00000859-f2bf-4578-8d90-429d4c0e5c9c'],
+            'action' => 'like',
+            'info' => [
+                'foo' => 80
+            ]
+        ];
+        $response = Http::post($url, $requestBody);
+        $responseBody = $response->body(); // Вся причина
+        return $responseBody;
+    });
+    Route::post('/videos/{video}/undislike', function (Request $request) {
+        RateLimiter::clear('login.'.$request->ip());
+        $url = env("MAIN_API_URL", "http://5.35.94.149:5000/receive");
 
-//        return [
-//            'sess' => \Illuminate\Support\Facades\Session::getId(),
-//            'de' => 'dede',
-//        ];
+        // Тело запроса, например, массив данных
+        $requestBody = [
+            'session_id' => \Illuminate\Support\Facades\Session::getId(),
+            'video_id' => ['00000859-f2bf-4578-8d90-429d4c0e5c9c'],
+            'action' => 'undislike',
+            'info' => [
+                'foo' => 80
+            ]
+        ];
+        $response = Http::post($url, $requestBody);
+        $responseBody = $response->body(); // Вся причина
+        return $responseBody;
+    });
+    Route::post('/videos/{video}/unlike', function (Request $request) {
+        RateLimiter::clear('login.'.$request->ip());
+        $url = env("MAIN_API_URL", "http://5.35.94.149:5000/receive");
+
+        // Тело запроса, например, массив данных
+        $requestBody = [
+            'session_id' => \Illuminate\Support\Facades\Session::getId(),
+            'video_id' => ['00000859-f2bf-4578-8d90-429d4c0e5c9c'],
+            'action' => 'unlike',
+            'info' => [
+                'foo' => 80
+            ]
+        ];
+        $response = Http::post($url, $requestBody);
+        $responseBody = $response->body(); // Вся причина
+        return $responseBody;
+    });
+    Route::post('/videos/{video}/viewed', function (Request $request) {
+        RateLimiter::clear('login.'.$request->ip());
+        $url = env("MAIN_API_URL", "http://5.35.94.149:5000/receive");
+
+        // Тело запроса, например, массив данных
+        $requestBody = [
+            'session_id' => \Illuminate\Support\Facades\Session::getId(),
+            'video_id' => ['00000859-f2bf-4578-8d90-429d4c0e5c9c'],
+            'action' => 'stop',
+            'info' => [
+                'percentage' => $request->input('percentage')
+            ]
+        ];
+        $response = Http::post($url, $requestBody);
+        $responseBody = $response->body(); // Вся причина
+        return $responseBody;
+    });
+    Route::post('/videos/{video}/comment', function (Request $request) {
+        RateLimiter::clear('login.'.$request->ip());
+        $url = env("MAIN_API_URL", "http://5.35.94.149:5000/receive");
+
+        // Тело запроса, например, массив данных
+        $requestBody = [
+            'session_id' => \Illuminate\Support\Facades\Session::getId(),
+            'video_id' => ['00000859-f2bf-4578-8d90-429d4c0e5c9c'],
+            'action' => 'comment',
+            'info' => [
+                'foo' => 80
+            ]
+        ];
+        $response = Http::post($url, $requestBody);
+        $responseBody = $response->body(); // Вся причина
+        return $responseBody;
     });
     Route::get('/videos/{video}/counts', function (Request $request) {
         RateLimiter::clear('login.'.$request->ip());
