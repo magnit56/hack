@@ -96,7 +96,7 @@
                     <input type="hidden" id="video-id-{{ $loop->index }}" value="{{ $video->video_id }}">
 <!--                    <span >{{ $video->video_id }}</span>-->
                     <h5 class="card-title" data-toggle="tooltip" data-placement="top" title="{{ $video->title }}">
-                        {{ Str::length($video->title) > 50 ? Str::limit($video->title, 47) : $video->title }}
+                        {{ Str::length($video->title) > 30 ? Str::limit($video->title, 27) : $video->title }}
                     </h5>
                     <p class="card-text" data-toggle="tooltip" data-placement="top" title="{{ $video->description }}">
                         <span class="badge" style="background-color: #100943; color: white;">{{ $video->category_id }}</span>
