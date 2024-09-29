@@ -2,6 +2,10 @@
 
 @section('content')
 <style>
+    .card-text {
+        min-height: 20px; /* Установите минимальную высоту блока */
+        overflow: hidden; /* Скрывает лишний текст, если он не помещается */
+    }
     button {
         margin-top: 3px;
         margin-bottom: 3px;
@@ -102,7 +106,7 @@
                         <span class="badge" style="background-color: #100943; color: white;">{{ $video->category_id }}</span>
                     </p>
                     <p class="card-text" data-toggle="tooltip" data-placement="top" title="{{ $video->description }}">
-                        {{ Str::length($video->description) > 30 ? Str::limit($video->description, 27) : $video->description }}
+                        {{ Str::length($video->description) > 30 ? Str::limit($video->description, 27) : ($video->description ?? ' ') }}
                     </p>
                     <div class="slider-container" style="position: relative; width: 100%; max-width: 600px; overflow: hidden;">
                         <div class="image-container">
