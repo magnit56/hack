@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RequestJob;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -38,5 +39,21 @@ class VideoController extends Controller
             ]);
         }
         return view('videos.index', compact('videos'));
+    }
+
+    public function action(Request $request, string $video)
+    {
+        $t = now();
+        $requestBody = [
+            'session_id' => Session::getId(),
+            'video_id' => [$video],
+            'action' => 'top',
+            'info' => [
+                'foo' => 80
+            ]
+        ];
+        RequestJob::dispatch($requestBody);
+        dump(now()->diff($t));
+        return true;
     }
 }
