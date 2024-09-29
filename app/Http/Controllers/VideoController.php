@@ -43,7 +43,6 @@ class VideoController extends Controller
 
     public function action(Request $request, string $video)
     {
-        $t = now();
         $requestBody = [
             'session_id' => Session::getId(),
             'video_id' => [$video],
@@ -53,7 +52,6 @@ class VideoController extends Controller
             ]
         ];
         RequestJob::dispatch($requestBody);
-        dump(now()->diff($t));
         return true;
     }
 }
